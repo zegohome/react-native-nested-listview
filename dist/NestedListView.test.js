@@ -4,17 +4,14 @@
 // import * as renderer from "react-test-renderer";
 // import NestedListView from "./NestedListView";
 // import NestedRow from "./NestedRow";
-
 // jest.mock("shortid", () => ({
 //   generate: () => "1"
 // }));
-
 // const renderNode = (node: any) => (
 //   <View>
 //     <Text>{node.name}</Text>
 //   </View>
 // );
-
 // describe("NestedListView", () => {
 //   test("renders with simple array", () => {
 //     const data = [
@@ -33,7 +30,6 @@
 //       .toJSON();
 //     expect(nestedListView).toMatchSnapshot();
 //   });
-
 //   test("renders with nested arrays", () => {
 //     const data = [
 //       {
@@ -79,7 +75,6 @@
 //       .toJSON();
 //     expect(nestedListView).toMatchSnapshot();
 //   });
-
 //   test("renders with nested arrays and children with different that does not exists", () => {
 //     const data = [
 //       {
@@ -105,7 +100,6 @@
 //       .toJSON();
 //     expect(nestedListView).toMatchSnapshot();
 //   });
-
 //   test("renders with children as objects", () => {
 //     const data = [
 //       {
@@ -156,7 +150,6 @@
 //       .toJSON();
 //     expect(nestedListView).toMatchSnapshot();
 //   });
-
 //   test("renders with onNodePressed", () => {
 //     const data = [
 //       { title: "child1" },
@@ -175,7 +168,6 @@
 //       .toJSON();
 //     expect(nestedListView).toMatchSnapshot();
 //   });
-
 //   test("renders with NestedRow", () => {
 //     const data = [
 //       { title: "child1" },
@@ -196,3 +188,4 @@
 //     expect(nestedListView).toMatchSnapshot();
 //   });
 // });
+//# sourceMappingURL=NestedListView.test.js.map

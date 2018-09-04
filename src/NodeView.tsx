@@ -1,31 +1,33 @@
 /* @flow */
 
-import isEqual from 'lodash.isequal'
-import * as React from 'react'
-import {FlatList, TouchableWithoutFeedback, View} from 'react-native'
+import isEqual from "lodash.isequal";
+import * as React from "react";
+import { FlatList, TouchableWithoutFeedback, View } from "react-native";
 
 export interface INode {
-  _internalId: string
-  hidden: boolean
-  opened: boolean
-  [key: string]: any
+  _internalId: string;
+  hidden: boolean;
+  opened: boolean;
+  [key: string]: any;
 }
 
 export interface IProps {
-  generateIds?: (node?: INode) => any
-  getChildren?: () => any
-  getChildrenName: (item: INode) => any
-  node: INode
-  level: number
-  onNodePressed?: (item: any) => any
-  renderNode: (item: any, level: number) => any
-  renderChildrenNode?: (item: any) => any
-  extraData?: any
+  lastItem: boolean;
+  generateIds?: (node?: INode) => any;
+  getChildren?: () => any;
+  getChildrenName: (item: INode) => any;
+  node: INode;
+  level: number;
+  onNodePressed?: (item: any) => any;
+  renderNode: (item: any, level: number) => any;
+  renderSeparator: (level: number, lastItem: boolean, opened: boolean) => any;
+  renderChildrenNode?: (item: any) => any;
+  extraData?: any;
 }
 
 export interface IState {
-  node: INode
-  extraData?: any
+  node: INode;
+  extraData?: any;
 }
 
 export default class NodeView extends React.PureComponent<IProps, IState> {
@@ -33,9 +35,9 @@ export default class NodeView extends React.PureComponent<IProps, IState> {
     this.setState({
       node: {
         opened: false,
-        ...this.props.node,
-      },
-    })
+        ...this.props.node
+      }
+    });
   }
 
   public componentWillReceiveProps(nextProps: IProps) {
@@ -43,9 +45,9 @@ export default class NodeView extends React.PureComponent<IProps, IState> {
       this.setState({
         node: {
           opened: false,
-          ...nextProps.node,
-        },
-      })
+          ...nextProps.node
+        }
+      });
     }
   }
 
@@ -53,16 +55,20 @@ export default class NodeView extends React.PureComponent<IProps, IState> {
     this.setState({
       node: {
         ...this.state.node,
-        opened: !this.state.node.opened,
-      },
-    })
+        opened: !this.state.node.opened
+      }
+    });
 
     if (this.props.onNodePressed) {
-      this.props.onNodePressed(this.state.node)
+      this.props.onNodePressed(this.state.node);
     }
-  }
+  };
 
-  public renderChildren = (item: INode, level: number, lastItem: boolean): any => {
+  public renderChildren = (
+    item: INode,
+    level: number,
+    lastItem: boolean
+  ): any => {
     return (
       <NodeView
         lastItem={lastItem}
@@ -74,19 +80,19 @@ export default class NodeView extends React.PureComponent<IProps, IState> {
         renderNode={this.props.renderNode}
         renderSeparator={this.props.renderSeparator}
       />
-    )
-  }
+    );
+  };
 
-  public renderItem = ({item, index}: {item: INode, index: number}) => {
-    const rootChildrenName = this.props.getChildrenName(this.state.node)
-    const allItems = this.state.node[rootChildrenName]
-    const lastItem = allItems ? index === allItems.length - 1 : false
-    return this.renderChildren(item, this.props.level, lastItem)
-  }
+  public renderItem = ({ item, index }: { item: INode; index: number }) => {
+    const rootChildrenName = this.props.getChildrenName(this.state.node);
+    const allItems = this.state.node[rootChildrenName];
+    const lastItem = allItems ? index === allItems.length - 1 : false;
+    return this.renderChildren(item, this.props.level, lastItem);
+  };
 
   public render() {
-    const rootChildrenName = this.props.getChildrenName(this.state.node)
-    const rootChildren = this.state.node[rootChildrenName]
+    const rootChildrenName = this.props.getChildrenName(this.state.node);
+    const rootChildren = this.state.node[rootChildrenName];
 
     return (
       <View>
@@ -106,13 +112,13 @@ export default class NodeView extends React.PureComponent<IProps, IState> {
             ListFooterComponent={this.state.node.footerComponent}
           />
         ) : null}
-       {this.props.renderSeparator &&
+        {this.props.renderSeparator &&
           this.props.renderSeparator(
             this.props.level,
             this.props.lastItem,
             this.state.node.opened
           )}
       </View>
-    )
+    );
   }
 }
