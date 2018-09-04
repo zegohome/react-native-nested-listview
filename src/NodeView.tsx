@@ -62,21 +62,27 @@ export default class NodeView extends React.PureComponent<IProps, IState> {
     }
   }
 
-  public renderChildren = (item: INode, level: number): any => {
+  public renderChildren = (item: INode, level: number, lastItem: boolean): any => {
     return (
       <NodeView
+        lastItem={lastItem}
         getChildrenName={this.props.getChildrenName}
         node={item}
         level={level + 1}
         extraData={this.props.extraData}
         onNodePressed={this.props.onNodePressed}
         renderNode={this.props.renderNode}
+        renderSeparator={this.props.renderSeparator}
       />
     )
   }
 
-  public renderItem = ({item}: {item: INode}) =>
-    this.renderChildren(item, this.props.level)
+  public renderItem = ({item, index}: {item: INode, index: number}) => {
+    const rootChildrenName = this.props.getChildrenName(this.state.node)
+    const allItems = this.state.node[rootChildrenName]
+    const lastItem = allItems ? index === allItems.length - 1 : false
+    return this.renderChildren(item, this.props.level, lastItem)
+  }
 
   public render() {
     const rootChildrenName = this.props.getChildrenName(this.state.node)
@@ -97,8 +103,15 @@ export default class NodeView extends React.PureComponent<IProps, IState> {
             renderItem={this.renderItem}
             extraData={this.props.extraData}
             keyExtractor={(item: INode) => item._internalId}
+            ListFooterComponent={this.state.node.footerComponent}
           />
         ) : null}
+       {this.props.renderSeparator &&
+          this.props.renderSeparator(
+            this.props.level,
+            this.props.lastItem,
+            this.state.node.opened
+          )}
       </View>
     )
   }
