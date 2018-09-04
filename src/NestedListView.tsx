@@ -90,7 +90,7 @@ export default class NestedListView extends React.PureComponent<
   }
 
   public render() {
-    const {data, getChildrenName, onNodePressed, renderNode} = this.props
+    const {data, renderSeparator, getChildrenName, onNodePressed, renderNode} = this.props
 
     if (!getChildrenName) {
       return this.renderErrorMessage('getChildrenName')
@@ -106,6 +106,7 @@ export default class NestedListView extends React.PureComponent<
 
     return (
       <NodeView
+        renderSeparator={renderSeparator}
         getChildrenName={this.getChildrenName}
         node={this.state.root}
         onNodePressed={onNodePressed}
