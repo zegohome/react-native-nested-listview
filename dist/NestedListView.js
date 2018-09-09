@@ -1,8 +1,7 @@
 /* @flow */
 import isEqual from "lodash.isequal";
 import * as React from "react";
-import { StyleSheet, Text, View } from "react-native";
-import * as shortid from "shortid";
+import { StyleSheet, Text, View, Platform, UIManager } from "react-native";
 import NodeView from "./NodeView";
 const styles = StyleSheet.create({
     errorContainer: {
@@ -20,8 +19,8 @@ const styles = StyleSheet.create({
     }
 });
 export default class NestedListView extends React.PureComponent {
-    constructor() {
-        super(...arguments);
+    constructor(props) {
+        super(props);
         this.generateIds = (node) => {
             if (!node) {
                 return;
@@ -34,7 +33,7 @@ export default class NestedListView extends React.PureComponent {
                 }
                 node[childrenName] = children.map((_, index) => this.generateIds(children[index]));
             }
-            node._internalId = shortid.generate();
+            // node._internalId = shortid.generate();
             return node;
         };
         this.getChildrenName = (node) => {
@@ -47,7 +46,7 @@ export default class NestedListView extends React.PureComponent {
         };
         this.generateRootNode = (props) => {
             return {
-                _internalId: shortid.generate(),
+                // _internalId: shortid.generate(),
                 items: props.data
                     ? props.data.map((_, index) => this.generateIds(props.data[index]))
                     : [],
@@ -56,6 +55,10 @@ export default class NestedListView extends React.PureComponent {
                 hidden: true
             };
         };
+        if (Platform.OS === "android") {
+            UIManager.setLayoutAnimationEnabledExperimental &&
+                UIManager.setLayoutAnimationEnabledExperimental(true);
+        }
     }
     componentWillMount() {
         this.setState({ root: this.generateRootNode(this.props) });

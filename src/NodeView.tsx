@@ -2,10 +2,14 @@
 
 import isEqual from "lodash.isequal";
 import * as React from "react";
-import { FlatList, TouchableWithoutFeedback, View } from "react-native";
+import {
+  FlatList,
+  TouchableWithoutFeedback,
+  View,
+  LayoutAnimation
+} from "react-native";
 
 export interface INode {
-  _internalId: string;
   hidden: boolean;
   opened: boolean;
   [key: string]: any;
@@ -44,7 +48,7 @@ export default class NodeView extends React.PureComponent<IProps, IState> {
     if (!isEqual(this.props.node, nextProps.node)) {
       this.setState({
         node: {
-          opened: false,
+          opened: this.state.node.opened,
           ...nextProps.node
         }
       });
@@ -58,6 +62,8 @@ export default class NodeView extends React.PureComponent<IProps, IState> {
         opened: !this.state.node.opened
       }
     });
+
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
 
     if (this.props.onNodePressed) {
       this.props.onNodePressed(this.state.node);
@@ -108,8 +114,11 @@ export default class NodeView extends React.PureComponent<IProps, IState> {
             data={rootChildren}
             renderItem={this.renderItem}
             extraData={this.props.extraData}
-            keyExtractor={(item: INode) => item._internalId}
-            ListFooterComponent={this.state.node.footerComponent}
+            keyExtractor={(item: INode) => item.id}
+            ListFooterComponent={
+              this.state.node.renderFooter &&
+              this.state.node.renderFooter(this.state.node)
+            }
           />
         ) : null}
         {this.props.renderSeparator &&

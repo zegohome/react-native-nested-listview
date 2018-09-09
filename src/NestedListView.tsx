@@ -2,7 +2,7 @@
 
 import isEqual from "lodash.isequal";
 import * as React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View, Platform, UIManager } from "react-native";
 import * as shortid from "shortid";
 import NodeView, { INode } from "./NodeView";
 
@@ -40,6 +40,14 @@ export default class NestedListView extends React.PureComponent<
   IProps,
   IState
 > {
+  constructor(props: any) {
+    super(props);
+    if (Platform.OS === "android") {
+      UIManager.setLayoutAnimationEnabledExperimental &&
+        UIManager.setLayoutAnimationEnabledExperimental(true);
+    }
+  }
+
   public componentWillMount() {
     this.setState({ root: this.generateRootNode(this.props) });
   }
@@ -67,7 +75,7 @@ export default class NestedListView extends React.PureComponent<
       );
     }
 
-    node._internalId = shortid.generate();
+    // node._internalId = shortid.generate();
 
     return node;
   };
@@ -128,7 +136,7 @@ export default class NestedListView extends React.PureComponent<
 
   private generateRootNode = (props: any): INode => {
     return {
-      _internalId: shortid.generate(),
+      // _internalId: shortid.generate(),
       items: props.data
         ? props.data.map((_: INode, index: number) =>
             this.generateIds(props.data[index])

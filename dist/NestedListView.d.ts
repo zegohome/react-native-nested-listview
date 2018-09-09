@@ -13,6 +13,7 @@ export interface IState {
     root: any;
 }
 export default class NestedListView extends React.PureComponent<IProps, IState> {
+    constructor(props: any);
     componentWillMount(): void;
     componentWillReceiveProps(nextProps: any): void;
     generateIds: (node?: INode | undefined) => INode | undefined;

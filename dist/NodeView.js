@@ -1,7 +1,7 @@
 /* @flow */
 import isEqual from "lodash.isequal";
 import * as React from "react";
-import { FlatList, TouchableWithoutFeedback, View } from "react-native";
+import { FlatList, TouchableWithoutFeedback, View, LayoutAnimation } from "react-native";
 export default class NodeView extends React.PureComponent {
     constructor() {
         super(...arguments);
@@ -9,6 +9,7 @@ export default class NodeView extends React.PureComponent {
             this.setState({
                 node: Object.assign({}, this.state.node, { opened: !this.state.node.opened })
             });
+            LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
             if (this.props.onNodePressed) {
                 this.props.onNodePressed(this.state.node);
             }
@@ -31,7 +32,7 @@ export default class NodeView extends React.PureComponent {
     componentWillReceiveProps(nextProps) {
         if (!isEqual(this.props.node, nextProps.node)) {
             this.setState({
-                node: Object.assign({ opened: false }, nextProps.node)
+                node: Object.assign({ opened: this.state.node.opened }, nextProps.node)
             });
         }
     }
@@ -44,7 +45,8 @@ export default class NodeView extends React.PureComponent {
               {this.props.renderNode(this.state.node, this.props.level)}
             </View>
           </TouchableWithoutFeedback>) : null}
-        {this.state.node.opened && rootChildren ? (<FlatList data={rootChildren} renderItem={this.renderItem} extraData={this.props.extraData} keyExtractor={(item) => item._internalId} ListFooterComponent={this.state.node.footerComponent}/>) : null}
+        {this.state.node.opened && rootChildren ? (<FlatList data={rootChildren} renderItem={this.renderItem} extraData={this.props.extraData} keyExtractor={(item) => item.id} ListFooterComponent={this.state.node.renderFooter &&
+            this.state.node.renderFooter(this.state.node)}/>) : null}
         {this.props.renderSeparator &&
             this.props.renderSeparator(this.props.level, this.props.lastItem, this.state.node.opened)}
       </View>);
