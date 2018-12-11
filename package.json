@@ -1,5 +1,5 @@
 {
-  "name": "react-native-nested-listview",
+  "name": "zego-react-native-nested-listview",
   "version": "0.6.1",
   "description": "Nested Listview for React native",
   "main": "./dist/index.js",
