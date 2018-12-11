@@ -2,6 +2,7 @@
 import isEqual from "lodash.isequal";
 import * as React from "react";
 import { StyleSheet, Text, View, Platform, UIManager } from "react-native";
+import * as shortid from "shortid";
 import NodeView from "./NodeView";
 const styles = StyleSheet.create({
     errorContainer: {
@@ -33,7 +34,8 @@ export default class NestedListView extends React.PureComponent {
                 }
                 node[childrenName] = children.map((_, index) => this.generateIds(children[index]));
             }
-            // node._internalId = shortid.generate();
+            if (!node.id)
+                node.id = shortid.generate();
             return node;
         };
         this.getChildrenName = (node) => {
@@ -46,7 +48,7 @@ export default class NestedListView extends React.PureComponent {
         };
         this.generateRootNode = (props) => {
             return {
-                // _internalId: shortid.generate(),
+                id: shortid.generate(),
                 items: props.data
                     ? props.data.map((_, index) => this.generateIds(props.data[index]))
                     : [],
