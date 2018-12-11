@@ -1,6 +1,5 @@
 import * as React from "react";
 export interface INode {
-    id: string;
     hidden: boolean;
     opened: boolean;
     [key: string]: any;
