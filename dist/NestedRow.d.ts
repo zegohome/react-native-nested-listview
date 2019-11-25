@@ -6,6 +6,5 @@ export interface IProps {
     paddingLeftIncrement?: number;
     style?: any;
 }
-export default class NestedRow extends React.PureComponent<IProps> {
-    render(): JSX.Element;
-}
+declare const NestedRow: React.MemoExoticComponent<({ height, children, level, paddingLeftIncrement, style, }: IProps) => JSX.Element>;
+export default NestedRow;

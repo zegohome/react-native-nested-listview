@@ -1,90 +1,96 @@
 /* @flow */
-import isEqual from "lodash.isequal";
-import * as React from "react";
-import { StyleSheet, Text, View, Platform, UIManager } from "react-native";
-import NodeView from "./NodeView";
+import React, { useEffect, useState } from 'react';
+import isEqual from 'react-fast-compare';
+import { StyleSheet, Text, View, UIManager, Platform } from 'react-native';
+import NodeView from './NodeView';
 const styles = StyleSheet.create({
     errorContainer: {
-        borderColor: "rgb(84, 85, 86)",
-        backgroundColor: "rgb(237, 57, 40)",
+        borderColor: 'rgb(84, 85, 86)',
+        backgroundColor: 'rgb(237, 57, 40)',
         borderWidth: 1,
-        justifyContent: "center",
-        alignItems: "center",
-        height: 60
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: 60,
     },
     errorText: {
-        color: "rgb(255, 255, 255)",
+        color: 'rgb(255, 255, 255)',
         fontSize: 17,
-        fontWeight: "bold"
-    }
+        fontWeight: 'bold',
+    },
 });
-export default class NestedListView extends React.PureComponent {
-    constructor(props) {
-        super(props);
-        this.generateIds = (node) => {
-            if (!node) {
-                return;
+const NestedListView = React.memo(({ getChildrenName, renderNode, renderSeparator, data, onNodePressed, extraData }) => {
+    const generateIds = (node) => {
+        if (!node) {
+            return {};
+        }
+        const childrenName = getChildrenName(node) || 'items';
+        let children = node[childrenName];
+        if (children) {
+            if (!Array.isArray(children)) {
+                children = Object.keys(children).map((key) => children[key]);
             }
-            const childrenName = this.props.getChildrenName(node) || "items";
-            let children = node[childrenName];
-            if (children) {
-                if (!Array.isArray(children)) {
-                    children = Object.keys(children).map((key) => children[key]);
-                }
-                node[childrenName] = children.map((_, index) => this.generateIds(children[index]));
-            }
-            // node._internalId = shortid.generate();
-            return node;
+            node[childrenName] = children.map((_, index) => generateIds(children[index]));
+        }
+        //node._internalId = shortid.generate()
+        return node;
+    };
+    const generateRootNode = (props) => {
+        return {
+            //_internalId: shortid.generate(),
+            items: props.data
+                ? props.data.map((_, index) => generateIds(props.data[index]))
+                : [],
+            name: 'root',
+            opened: true,
+            hidden: true,
         };
-        this.getChildrenName = (node) => {
-            if (node.name === "root") {
-                return "items";
-            }
-            return this.props.getChildrenName
-                ? this.props.getChildrenName(node)
-                : "items";
-        };
-        this.generateRootNode = (props) => {
-            return {
-                // _internalId: shortid.generate(),
-                items: props.data
-                    ? props.data.map((_, index) => this.generateIds(props.data[index]))
-                    : [],
-                name: "root",
-                opened: true,
-                hidden: true
-            };
-        };
+    };
+    // tslint:disable-next-line:variable-name
+    const [_root, setRoot] = useState(generateRootNode({
+        renderSeparator,
+        getChildrenName,
+        renderNode,
+        data,
+        onNodePressed,
+        extraData,
+    }));
+    useEffect(() => {
         if (Platform.OS === "android") {
             UIManager.setLayoutAnimationEnabledExperimental &&
                 UIManager.setLayoutAnimationEnabledExperimental(true);
         }
-    }
-    componentWillMount() {
-        this.setState({ root: this.generateRootNode(this.props) });
-    }
-    componentWillReceiveProps(nextProps) {
-        if (!isEqual(this.props.data, nextProps.data)) {
-            this.setState({ root: this.generateRootNode(nextProps) });
+    }, []);
+    useEffect(() => {
+        setRoot(generateRootNode({
+            renderSeparator,
+            getChildrenName,
+            renderNode,
+            data,
+            onNodePressed,
+            extraData,
+        }));
+    }, [data, extraData, getChildrenName, renderNode, onNodePressed]);
+    // tslint:disable-next-line:variable-name
+    const _getChildrenName = (node) => {
+        if (node.name === 'root') {
+            return 'items';
         }
-    }
-    renderErrorMessage(prop) {
+        return getChildrenName ? getChildrenName(node) : 'items';
+    };
+    const renderErrorMessage = (prop) => {
         return (<View style={styles.errorContainer}>
-        <Text style={styles.errorText}>prop {prop} has not been passed</Text>
-      </View>);
+          <Text style={styles.errorText}>
+            prop {prop} has not been passed
+                    </Text>
+        </View>);
+    };
+    if (!renderNode) {
+        return renderErrorMessage('renderNode');
     }
-    render() {
-        const { data, renderSeparator, getChildrenName, onNodePressed, renderNode } = this.props;
-        if (!getChildrenName) {
-            return this.renderErrorMessage("getChildrenName");
-        }
-        if (!renderNode) {
-            return this.renderErrorMessage("renderNode");
-        }
-        if (!data) {
-            return this.renderErrorMessage("data");
-        }
-        return (<NodeView lastItem={false} renderSeparator={renderSeparator} getChildrenName={this.getChildrenName} node={this.state.root} onNodePressed={onNodePressed} generateIds={this.generateIds} level={0} renderNode={renderNode} extraData={this.props.extraData}/>);
+    if (!data) {
+        return renderErrorMessage('data');
     }
-}
+    return (<NodeView getChildrenName={_getChildrenName} lastItem={false} renderSeparator={renderSeparator} node={_root} onNodePressed={onNodePressed} generateIds={generateIds} level={0} renderNode={renderNode} extraData={extraData}/>);
+}, isEqual);
+export default NestedListView;
 //# sourceMappingURL=NestedListView.js.map

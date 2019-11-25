@@ -1,133 +1,129 @@
 /* @flow */
 
-import isEqual from "lodash.isequal";
-import * as React from "react";
-import {
-  FlatList,
-  TouchableWithoutFeedback,
-  View,
-  LayoutAnimation
-} from "react-native";
+import React, { useEffect, useState } from 'react'
+import isEqual from 'react-fast-compare'
+import { FlatList, TouchableWithoutFeedback, View, LayoutAnimation } from 'react-native'
 
 export interface INode {
-  hidden: boolean;
-  opened: boolean;
-  [key: string]: any;
+  hidden: boolean
+  opened: boolean
+  [key: string]: any
 }
 
 export interface IProps {
-  lastItem: boolean;
-  generateIds?: (node?: INode) => any;
-  getChildren?: () => any;
-  getChildrenName: (item: INode) => any;
-  node: INode;
-  level: number;
-  onNodePressed?: (item: any) => any;
-  renderNode: (item: any, level: number) => any;
+  lastItem: boolean
+  generateIds?: (node?: INode) => any
+  getChildren?: () => any
+  getChildrenName: (item: INode) => any
+  node: INode
+  level: number
+  onNodePressed?: (item: any) => any
+  renderNode: (item: any, level: number) => any
+  renderChildrenNode?: (item: any) => any
   renderSeparator: (level: number, lastItem: boolean, opened: boolean) => any;
-  renderChildrenNode?: (item: any) => any;
-  extraData?: any;
+  extraData?: any
 }
 
 export interface IState {
-  node: INode;
-  extraData?: any;
+  node: INode
+  extraData?: any
+  opened: boolean
 }
 
-export default class NodeView extends React.PureComponent<IProps, IState> {
-  public componentWillMount() {
-    this.setState({
-      node: {
-        opened: false,
-        ...this.props.node
+const NodeView = React.memo(
+  ({
+    lastItem,
+    renderNode,
+    extraData,
+    level,
+    getChildrenName,
+    node,
+    onNodePressed,
+    renderSeparator
+  }: IProps) => {
+    // tslint:disable-next-line:variable-name
+    const [_node, setNode]: [INode, any] = useState({
+      opened: false,
+      ...node,
+    })
+
+    useEffect(() => {
+      setNode({
+        ...node,
+        opened: _node.opened,
+      })
+    }, [node])
+
+    // tslint:disable-next-line:variable-name
+    const _onNodePressed = () => {
+      setNode({
+        ..._node,
+        opened: !_node.opened,
+      })
+
+      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+
+      if (onNodePressed) {
+        onNodePressed(_node)
       }
-    });
-  }
-
-  public componentWillReceiveProps(nextProps: IProps) {
-    if (!isEqual(this.props.node, nextProps.node)) {
-      this.setState({
-        node: {
-          opened: this.state.node.opened,
-          ...nextProps.node
-        }
-      });
     }
-  }
 
-  public onNodePressed = () => {
-    this.setState({
-      node: {
-        ...this.state.node,
-        opened: !this.state.node.opened
-      }
-    });
-
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-
-    if (this.props.onNodePressed) {
-      this.props.onNodePressed(this.state.node);
+    // tslint:disable-next-line:variable-name
+    const renderChildren = (item: INode, _level: number, lastItem: boolean): any => {
+      return (
+        <NodeView
+          lastItem={lastItem}
+          getChildrenName={getChildrenName}
+          node={item}
+          level={_level + 1}
+          extraData={extraData}
+          onNodePressed={onNodePressed}
+          renderNode={renderNode}
+          renderSeparator={renderSeparator}
+        />
+      )
     }
-  };
 
-  public renderChildren = (
-    item: INode,
-    level: number,
-    lastItem: boolean
-  ): any => {
-    return (
-      <NodeView
-        lastItem={lastItem}
-        getChildrenName={this.props.getChildrenName}
-        node={item}
-        level={level + 1}
-        extraData={this.props.extraData}
-        onNodePressed={this.props.onNodePressed}
-        renderNode={this.props.renderNode}
-        renderSeparator={this.props.renderSeparator}
-      />
-    );
-  };
+    const renderItem = ({ item, index }: { item: INode, index: number }) => {
+      const rootChildrenName = getChildrenName(node);
+      const allItems = node[rootChildrenName];
+      const lastItem = allItems ? index === allItems.length - 1 : false;
+      return renderChildren(item, level, lastItem);
+    }
 
-  public renderItem = ({ item, index }: { item: INode; index: number }) => {
-    const rootChildrenName = this.props.getChildrenName(this.state.node);
-    const allItems = this.state.node[rootChildrenName];
-    const lastItem = allItems ? index === allItems.length - 1 : false;
-    return this.renderChildren(item, this.props.level, lastItem);
-  };
-
-  public render() {
-    const rootChildrenName = this.props.getChildrenName(this.state.node);
-    const rootChildren = this.state.node[rootChildrenName];
+    const rootChildrenName = getChildrenName(_node)
+    const rootChildren = _node[rootChildrenName]
 
     return (
-      <View>
-        {!this.state.node.hidden ? (
-          <TouchableWithoutFeedback onPress={this.onNodePressed}>
-            <View>
-              {this.props.renderNode(this.state.node, this.props.level)}
-            </View>
+      <>
+        {!_node.hidden ? (
+          <TouchableWithoutFeedback onPress={_onNodePressed}>
+            <View>{renderNode(_node, level)}</View>
           </TouchableWithoutFeedback>
         ) : null}
-        {this.state.node.opened && rootChildren ? (
+        {_node.opened && rootChildren ? (
           <FlatList
             data={rootChildren}
-            renderItem={this.renderItem}
-            extraData={this.props.extraData}
+            renderItem={renderItem}
+            extraData={extraData}
             keyExtractor={(item: INode) => item.id}
             ListFooterComponent={
-              this.state.node.renderFooter &&
-              this.state.node.renderFooter(this.state.node)
+              node.renderFooter &&
+              node.renderFooter(node)
             }
           />
         ) : null}
-        {this.props.renderSeparator &&
-          this.props.renderSeparator(
-            this.props.level,
-            this.props.lastItem,
-            this.state.node.opened
+        {renderSeparator &&
+          renderSeparator(
+            level,
+            lastItem,
+            node.opened
           )}
-      </View>
-    );
-  }
-}
+
+      </>
+    )
+  },
+  isEqual
+)
+
+export default NodeView

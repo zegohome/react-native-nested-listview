@@ -5,49 +5,51 @@
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "scripts": {
-    "test": "jest -u && codecov",
-    "lint": "eslint --cache ./src",
+    "test": "jest",
+    "test-coverage": "jest && codecov",
     "tslint": "tslint -p .",
     "type-check": "tsc --noEmit",
-    "prepublishOnly": "tsc -p ./ --outDir dist/"
+    "prepublishOnly": "tsc -p ./ --outDir dist/",
+    "add-react": "yarn add react@16.9.0 && yarn add react-native@0.60.5",
+    "remove-react": "yarn remove react && yarn remove react-native",
+    "prettier-check": "prettier --check 'src/**/*.{ts, tsx}'",
+    "prettier-format": "prettier --write 'src/**/*.{ts, tsx}'"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/fjmorant/react-native-nested-listview.git"
   },
   "dependencies": {
-    "@types/lodash.isequal": "^4.5.2",
-    "lodash.isequal": "^4.5.0",
-    "shortid": "^2.2.8"
+    "react-fast-compare": "2.0.4",
+    "shortid": "2.2.15"
   },
   "peerDependencies": {
-    "react": "16.2.0",
-    "react-native": "~0.54.2"
+    "react": "*",
+    "react-native": "*"
   },
   "devDependencies": {
-    "@types/jest": "^22.2.0",
-    "@types/react": "^16.0.40",
-    "@types/react-native": "^0.55.0",
-    "@types/react-test-renderer": "^16.0.1",
-    "@types/shortid": "^0.0.29",
-    "babel-eslint": "^8.0.1",
-    "babel-jest": "^22.4.1",
-    "babel-preset-react-native": "^4.0.0",
-    "eslint": "^4.9.0",
-    "eslint-plugin-flowtype": "^2.36.0",
-    "eslint-plugin-react": "^7.4.0",
-    "eslint-plugin-react-native": "^3.1.0",
-    "flow-bin": "^0.70.0",
-    "istanbul": "^0.4.5",
-    "istanbul-api": "1.2.2",
-    "istanbul-reports": "1.1.4",
-    "jest": "^22.4.2",
-    "prettier": "^1.7.0",
-    "prettier-eslint": "^8.2.1",
-    "react-test-renderer": "16.3.2",
-    "ts-jest": "^22.4.1",
-    "tslint": "^5.9.1",
-    "typescript": "^2.7.2"
+    "@babel/core": "7.7.2",
+    "@babel/runtime": "7.7.2",
+    "@types/jest": "24.0.23",
+    "@types/react": "16.9.11",
+    "@types/react-native": "0.60.22",
+    "@types/react-test-renderer": "16.9.1",
+    "@types/shortid": "0.0.29",
+    "babel-jest": "24.9.0",
+    "codecov": "3.6.1",
+    "istanbul": "0.4.5",
+    "istanbul-api": "2.1.6",
+    "istanbul-reports": "2.2.6",
+    "jest": "24.9.0",
+    "metro-react-native-babel-preset": "0.57.0",
+    "prettier": "1.19.1",
+    "prettier-eslint": "9.0.1",
+    "react": "16.9.0",
+    "react-native": "0.60.5",
+    "react-test-renderer": "16.12.0",
+    "ts-jest": "24.1.0",
+    "tslint": "5.20.1",
+    "typescript": "3.7.2"
   },
   "keywords": [
     "react",
@@ -90,7 +92,7 @@
     "collectCoverage": true,
     "globals": {
       "ts-jest": {
-        "useBabelrc": true
+        "babelConfig": true
       }
     }
   }
